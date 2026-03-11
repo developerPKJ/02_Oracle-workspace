@@ -1,0 +1,46 @@
+############################
+# VS Code
+############################
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+
+############################
+# Java build outputs
+############################
+**/bin/
+**/out/
+**/target/
+**/build/
+**/*.class
+
+############################
+# Eclipse (모든 하위 프로젝트)
+############################
+**/.project
+**/.classpath
+**/.settings/
+**/.metadata/
+**/.recommenders/
+
+############################
+# OS / temp
+############################
+Thumbs.db
+*.log
+*.tmp
+
+# ====================================
+# Oracle DB / SQL 관련
+# ====================================
+# 실제 DB 파일 / 환경 설정 제외
+*.dbf
+*.log
+*.ora
+*.ctl
+*.dmp
+*.trc
+*.sql~        # 백업용 임시 SQL
+*.rej         # 패치/머지 관련 임시 파일
