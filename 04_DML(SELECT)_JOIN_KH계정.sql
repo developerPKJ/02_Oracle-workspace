@@ -290,7 +290,7 @@ CROSS JOIN DEPARTMENT;
 /*
     4. 비등가 조인(NON-EQUAL JOIN)
     - 연결고리에 대한 조건식에 '='(동등비교 연산자, 등호) 대신에 다른 비교 연산자 사용
-    - 예시 : '>', '<', '>=', '<=', '!=', '<>' 
+    - 예시 : '>', '<', '>=', '<='
 */
 -- EMPLOYEE 테이블로부터 사원명, 급여
 SELECT *
@@ -445,6 +445,12 @@ ON M.DEPT_CODE = D2.DEPT_ID
 ORDER BY E.EMP_ID ASC;
 -- > 3개 이상의 테이블 조인 시에는 포괄 조인의 경우 연결된 모든 테이블들을 포괄시키는 조건으로 작성해야함
 
+/*
+    다중 조인
+    - 3개 이상의 테이블을 조인하는 경우
+    - N개 테이블을 조인하는 경우, N-1개의 JOIN 구문이 필요
+*/
+
 -- 사원명, 부서명, 직급명, 근무지역명, 근무국가명, 급여등급 조회
 -- ORACLE 전용 구문
 SELECT E.EMP_NAME, D.DEPT_TITLE, J.JOB_NAME, L.LOCAL_NAME, N.NATIONAL_NAME, S.SAL_LEVEL
@@ -470,3 +476,9 @@ ON L.NATIONAL_CODE = N.NATIONAL_CODE
 JOIN SAL_GRADE S
 ON E.SALARY BETWEEN S.MIN_SAL AND S.MAX_SAL
 ORDER BY E.EMP_NAME ASC;
+
+
+-- 테이블을 잘개 쪼갤수록 데이터 중복이 최소화 - 무결성 향상, 관리 용이
+-- 하지만 조인해서 조회해야 하는 테이블이 많아질수록 작성해야 하는 JOIN 구문이 많아지고, 복잡해짐
+-- > 조인해야 하는 테이블이 많아질수록 쿼리 작성이 어려워지고, 가독성이 떨어짐(select문 성능 저하)
+-- > INSERT, UPDATE, DELETE 구문의 성능은 향상됨
