@@ -111,8 +111,28 @@ INSERT INTO MEMBER VALUES(NULL, NULL, NULL, SYSDATE);
 
 
 /*
+    < 제약조건 CONSTRAINTS >
+    
+    - 원하는 데이터값만 항상 유지하기 위해서 (보관하기 위해서)
+      특정 컬럼마다 설정하는 제약 (데이터 무결성 보장을 목적으로)
+      
+    - 제약조건이 부여된 컬럼에 들어올 데이터에 문제가 있는지 없는지 자동으로 검사해줌!!
+      (애초에 데이터에 문제가 있다면 데이터가 저장되지 않음!!)
+    
+    [ 종류 ]
+    
+    NOT NULL, UNIQUE, CHECK, PRIMARY KEY, FOREGIN KEY
+
+    - 컬럼에 제약조건을 부여하는 방식 : 컬럼레벨방식 / 테이블레벨방식    
+*/
+
+/*
     1. NOT NULL 제약조건
-    - 컬럼에 NULL을 제한하는 제약조건
+    
+    - 해당 컬럼에 반드시 값이 존재해야 하는 경우 사용
+      (즉, NULL 값이 절대로 들어와서는 안되는 컬럼에 부여)
+      
+    - 단, NOT NULL 제약조건은 컬럼레벨방식으로만 부여할 수 있다!!
 */
 CREATE TABLE MEM_NOT_NULL (
     MEM_NO NUMBER NOT NULL,
@@ -132,9 +152,13 @@ DROP TABLE MEM_NOT_NULL;
 
 /*
     2. UNIQUE 제약조건
+    
     - 컬럼에 중복값을 제한하는 제약조건
-    - 데이터 삽입 / 수정 시 기존에
-    - 컬럼 레벨 
+    
+    - 데이터 삽입 / 수정 시 기존에 해당 컬럼값 중에 중복값이 이미 있을 경우
+      추가 또는 수정이 되지 않도록 막아줌
+      
+    - 컬럼레벨 / 테이블레벨방식 모두 다 가능
 */
 -- 컬럼 레벨 방식
 CREATE TABLE MEM_UNIQUE (
@@ -256,6 +280,24 @@ INSERT INTO MEM_CHECK VALUES(1, 'USER03', 'PASS03', 'NAM', NULL, '010-1234-5678'
 INSERT INTO MEM_CHECK VALUES(1, 'USER04', 'PASS04', 'JUN', 'MAN', '010-1234-5678', 'TEST@NAVER.COM');
 -- CHECK CONSTRAINT 위배 발생
 
+/*
+    번외 DEFAULT
+    - 컬럼에 데이터가 입력되지 않았을 때 자동으로 입력되는 기본값을 설정하는 구문
+    - 제약을 걸지 않기에 제약조건이 아님
+*/
+CREATE TABLE MEM_DEFAULT (
+    NEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PW VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CONSTRAINT MEM_CH_IN CHECK(GENDER IN ('남', '여')) DEFAULT '남',
+    PHONE CHAR(13),
+    EMAIL VARCHAR2(30)
+);
+-- 성별 입력 안할시 자동으로 '남' 입력
+
+
+
 
 /*
     4. PRIMARY KEY
@@ -281,6 +323,24 @@ CREATE TABLE MEM_PRI (
     PHONE CHAR(13),
     EMAIL VARCHAR2(30)
 );
+
+-- 단, 두 개 이상의 컬럼을 "하나로" 묶어서 PRIMARY KEY 하나로 설정 가능함!!
+CREATE TABLE MEM_PRIMARYKEY2 (
+    MEM_NO NUMBER,
+    MEM_ID VARCHAR2(20),
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE CHAR(13),
+    EMAIL VARCHAR2(30), -- 여기까지는 컬럼들을 나열
+    PRIMARY KEY(MEM_NO, MEM_ID) -- 제약조건을 나열 (테이블레벨방식)
+);
+--> 두 개 이상의 컬럼을 하나로 묶어서 PRIMARY KEY 하나로 설정 (복합키)
+--  복합키를 지정하고 싶다면 무조건 테이블레벨방식만 사용 가능함!!
+
+-- 복합키의 경우 2 컬럼 모두 동일해야 중복으로 판정
+-- 하나라도 NULL이면 오류 발생
+
 
 INSERT INTO MEM_PRI VALUES(1, 'USER01', 'PASS01', 'KIM', '남', '010-1234-5678', 'TEST@NAVER.COM');
 INSERT INTO MEM_PRI VALUES(NULL, 'USER02', 'PASS02', 'NAM', '여', '010-1234-5678', 'TEST@NAVER.COM');
@@ -502,7 +562,7 @@ AS (
 );
 -- WHERE 1 = 0 조건식은 항상 거짓이기에 DATA 없이 EMPLOYEE 테이블의 구조만 복사해서 NEW_EMPLOYEE 테이블 생성
 
--- CTAS를 사용해도 일부 제약조건은 복사되지 않음
+-- CTAS를 사용해도 NOT NULL을 제외한 제약조건 및 DEFAULT 값은 복사되지 않음
 -- CTAS를 사용해도 COMMENT는 복사되지 않음
 SELECT * FROM USER_CONSTRAINTS
 WHERE TABLE_NAME = 'NEW_EMPLOYEE';
